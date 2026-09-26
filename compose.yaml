@@ -1,0 +1,42 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: mydatabase
+      POSTGRES_PASSWORD: secret
+      POSTGRES_USER: myuser
+    ports:
+      - '${POSTGRES_HOST_PORT:-5432}:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U myuser -d mydatabase']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    image: ghcr.io/bestrider14/megafinder-backend:latest
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/mydatabase
+      SPRING_DATASOURCE_USERNAME: myuser
+      SPRING_DATASOURCE_PASSWORD: secret
+      MEGAFINDER_DOCUMENTATION_ROOT: /app/documentation
+      MEGAFINDER_CORS_ORIGINS: http://localhost:${MEGAFINDER_HTTP_PORT:-8080}
+    ports:
+      - '${BACKEND_HOST_PORT:-8082}:8082'
+    volumes:
+      - '${DOCUMENTATION_HOST_PATH:-./documentation}:/app/documentation'
+
+  frontend:
+    image: ghcr.io/bestrider14/megafinder-frontend:latest
+    depends_on:
+      - backend
+    ports:
+      - '${MEGAFINDER_HTTP_PORT:-8080}:80'
+
+volumes:
+  postgres-data:

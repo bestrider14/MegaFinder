@@ -1,0 +1,27 @@
+const API_URL = import.meta.env.VITE_API_URL || '/api'
+
+export async function api(path, options = {}) {
+  const response = await fetch(`${API_URL}${path}`, {
+    headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+    ...options,
+  })
+  if (!response.ok) throw new Error(await response.text() || 'Erreur serveur')
+  if (response.status === 204) return null
+  return response.json()
+}
+
+export const demoProjects = [
+  { id: 1, projectNumber: 'MF-2401', name: 'Banc de test ECU', contactPerson: 'Sophie Tremblay', description: 'Validation du contrôleur moteur et automatisation des scénarios.', status: 'ACTIVE' },
+  { id: 2, projectNumber: 'MF-2398', name: 'Module de puissance', contactPerson: 'Marc Gagnon', description: 'Documentation et tests de caractérisation du module.', status: 'ACTIVE' },
+  { id: 3, projectNumber: 'MF-2387', name: 'Interface capteurs', contactPerson: 'Nadia Roy', description: 'Suite de tests pour les entrées analogiques.', status: 'ARCHIVED' },
+]
+
+export const demoQuotes = [
+  { id: 1, name: 'Validation des entrées analogiques', projectNumber: 'MF-2401', projectName: 'Banc de test ECU', status: 'IN_PROGRESS', stepCount: 8 },
+  { id: 2, name: 'Démarrage et alimentation', projectNumber: 'MF-2398', projectName: 'Module de puissance', status: 'DRAFT', stepCount: 12 },
+]
+
+export const demoUsers = [
+  { id: 1, displayName: 'Alex Martin', email: 'alex.martin@megafinder.local', role: 'ADMIN', extraPermissions: ['GENERATE_CPP', 'MANAGE_USERS'], active: true },
+  { id: 2, displayName: 'Sophie Tremblay', email: 'sophie.tremblay@megafinder.local', role: 'ENGINEER', extraPermissions: ['GENERATE_CPP'], active: true },
+]

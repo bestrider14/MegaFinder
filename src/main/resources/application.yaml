@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: megafinder
+  datasource:
+    url: jdbc:postgresql://localhost:5432/mydatabase
+    username: myuser
+    password: secret
+  flyway:
+    enabled: true
+  docker:
+    compose:
+      enabled: false
+  jackson:
+    default-property-inclusion: non_null
+server:
+  port: 8082
+app:
+  documentation-root: ${MEGAFINDER_DOCUMENTATION_ROOT:./documentation}
+  cors-origins: ${MEGAFINDER_CORS_ORIGINS:http://localhost:5173}
