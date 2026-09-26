@@ -49,6 +49,26 @@ npm run dev
 
 La maquette est disponible sur `http://localhost:5173`.
 
+## Version Windows avec Tauri
+
+Tauri fournit une application de bureau capable d'ouvrir les fichiers locaux avec l'application Windows associée. Démarrer d'abord Docker, puis lancer Tauri :
+
+```powershell
+docker compose up -d
+cd frontend
+npm install
+npm run tauri:dev
+```
+
+Pour créer un installateur Windows :
+
+```powershell
+cd frontend
+npm run tauri:build
+```
+
+Les installateurs sont créés dans `frontend/src-tauri/target/release/bundle/`. L'application Tauri utilise l'API Docker sur `http://localhost:18082`.
+
 ## Fonctions du MVP
 
 - gestion CRUD des projets (`/api/projects`) ;
