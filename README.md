@@ -59,12 +59,10 @@ La maquette est disponible sur `http://localhost:5173`.
 
 L'API de fichiers renvoie uniquement les métadonnées et une URI `file://` pour ouvrir le fichier avec l'application du poste. Le contenu des documents n'est pas servi par Spring Boot.
 
-Si le port PostgreSQL 5432 est déjà pris, utiliser un port local différent :
+Le port PostgreSQL local utilisé par défaut est `55432` afin d'éviter les conflits avec une installation PostgreSQL existante :
 
 ```powershell
-$env:POSTGRES_HOST_PORT = '55432'
 docker compose up -d
-$env:SPRING_DATASOURCE_URL = 'jdbc:postgresql://localhost:55432/mydatabase'
 .\mvnw.cmd spring-boot:run
 ```
 
