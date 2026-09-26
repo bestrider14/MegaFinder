@@ -52,7 +52,10 @@ La maquette est disponible sur `http://localhost:5173`.
 ## Fonctions du MVP
 
 - gestion CRUD des projets (`/api/projects`) ;
+- chaque projet possède un dossier `documentation/projets/<numero-projet>` créé automatiquement ;
 - devis de tests avec étapes, conditions, pin, seuils, relais, voltage, type de mesure et unité (`/api/test-quotes`) ;
+- chaque devis est lié à un projet et à un template C++ choisi ;
+- création, modification et suppression des templates C++ personnalisés (`/api/test-templates`) ;
 - génération d'un fichier C++ GoogleTest via `POST /api/test-quotes/{id}/generate-cpp` ;
 - exploration du dossier local configuré par `MEGAFINDER_DOCUMENTATION_ROOT` (`/api/files`) ;
 - utilisateurs, rôles et permissions additionnelles (`/api/users`) ;
@@ -71,3 +74,7 @@ Les images sont reconstruites automatiquement par GitHub Actions à chaque push 
 
 - `ghcr.io/bestrider14/megafinder-backend:latest`
 - `ghcr.io/bestrider14/megafinder-frontend:latest`
+
+Les templates utilisent les variables `{{QUOTE_ID}}`, `{{QUOTE_NAME}}`, `{{PROJECT_NUMBER}}`,
+`{{PROJECT_NAME}}`, `{{TEST_CLASS}}` et `{{STEPS}}`. Le contenu d'un template est éditable depuis
+l'écran **Templates C++** de la maquette.

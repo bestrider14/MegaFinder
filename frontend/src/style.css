@@ -37,3 +37,9 @@ nav { display:grid; gap:4px; } nav button,.team-link { width:100%; display:flex;
 .file-actions { margin-left:auto; display:flex; gap:var(--file-actions-gap); }
 .file-actions button { margin-left:0; }
 .file-actions button:last-child { color:var(--muted); }
+.template-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:17px; }
+.quote-card-actions { display:flex; align-items:center; gap:10px; margin-top:18px; }
+.quote-card-actions .outline-button { margin-top:0; flex:1; }
+.template-editor { width:min(900px, calc(100vw - 30px)); }
+.template-editor textarea { min-height:280px; font-family:Consolas, monospace; font-size:12px; line-height:1.5; }
+.modal-help { color:var(--muted); font-size:11px; line-height:1.5; margin:0 0 14px; }
