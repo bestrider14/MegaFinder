@@ -21,11 +21,15 @@ public class ProjectController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Project create(@Valid @RequestBody ProjectRequest request) { return repository.create(request); }
+    public Project create(@Valid @RequestBody ProjectRequest request,
+                          @RequestHeader(value = "X-MegaFinder-User-Id", required = false) Long userId) {
+        return repository.create(request, userId);
+    }
 
     @PutMapping("/{id}")
-    public Project update(@PathVariable long id, @Valid @RequestBody ProjectRequest request) {
-        return repository.update(id, request);
+    public Project update(@PathVariable long id, @Valid @RequestBody ProjectRequest request,
+                          @RequestHeader(value = "X-MegaFinder-User-Id", required = false) Long userId) {
+        return repository.update(id, request, userId);
     }
 
     @DeleteMapping("/{id}")

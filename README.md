@@ -53,6 +53,7 @@ La maquette est disponible sur `http://localhost:5173`.
 
 - gestion CRUD des projets (`/api/projects`) ;
 - chaque projet possède un dossier `documentation/projets/<numero-projet>` créé automatiquement ;
+- historique des créations et modifications avec date, utilisateur et champs modifiés (`/api/projects/{id}/activity`) ;
 - devis de tests avec étapes, conditions, pin, seuils, relais, voltage, type de mesure et unité (`/api/test-quotes`) ;
 - chaque devis est lié à un projet et à un template C++ choisi ;
 - création, modification et suppression des templates C++ personnalisés (`/api/test-templates`) ;
@@ -60,6 +61,9 @@ La maquette est disponible sur `http://localhost:5173`.
 - exploration du dossier local configuré par `MEGAFINDER_DOCUMENTATION_ROOT` (`/api/files`) ;
 - utilisateurs, rôles et permissions additionnelles (`/api/users`) ;
 - données de dashboard (`/api/dashboard/summary`).
+
+La maquette utilise un thème sombre par défaut. L’utilisateur actif peut être choisi dans la barre supérieure;
+les créations et modifications de projets sont associées à cet utilisateur.
 
 L'API de fichiers renvoie uniquement les métadonnées et une URI `file://` pour ouvrir le fichier avec l'application du poste. Le contenu des documents n'est pas servi par Spring Boot. `DOCUMENTATION_HOST_PATH` doit être un chemin absolu du poste hôte pour que les liens fonctionnent depuis Docker.
 
