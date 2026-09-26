@@ -25,9 +25,9 @@ services:
       SPRING_DATASOURCE_USERNAME: myuser
       SPRING_DATASOURCE_PASSWORD: secret
       MEGAFINDER_DOCUMENTATION_ROOT: /app/documentation
-      MEGAFINDER_CORS_ORIGINS: http://localhost:${MEGAFINDER_HTTP_PORT:-8080}
+      MEGAFINDER_CORS_ORIGINS: http://localhost:${MEGAFINDER_HTTP_PORT:-18080}
     ports:
-      - '${BACKEND_HOST_PORT:-8082}:8082'
+      - '${BACKEND_HOST_PORT:-18082}:8082'
     volumes:
       - '${DOCUMENTATION_HOST_PATH:-./documentation}:/app/documentation'
 
@@ -36,7 +36,7 @@ services:
     depends_on:
       - backend
     ports:
-      - '${MEGAFINDER_HTTP_PORT:-8080}:80'
+      - '${MEGAFINDER_HTTP_PORT:-18080}:80'
 
 volumes:
   postgres-data:

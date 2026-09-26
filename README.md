@@ -13,7 +13,7 @@ docker compose pull
 docker compose up -d
 ```
 
-L'application est ensuite disponible sur `http://localhost:8080`.
+L'application est ensuite disponible sur `http://localhost:18080`.
 
 Pour utiliser un autre dossier de documentation :
 
@@ -36,7 +36,7 @@ Puis lancer Spring Boot dans un second terminal :
 .\mvnw.cmd spring-boot:run
 ```
 
-Le backend est disponible sur `http://localhost:8082` et applique automatiquement la migration Flyway avec les données de démonstration.
+Le backend local est disponible sur `http://localhost:8082` et applique automatiquement la migration Flyway avec les données de démonstration. Avec Docker Compose, il est accessible sur `http://localhost:18082`.
 
 Lancer le frontend dans un troisième terminal :
 
