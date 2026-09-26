@@ -54,6 +54,7 @@ La maquette est disponible sur `http://localhost:5173`.
 - gestion CRUD des projets (`/api/projects`) ;
 - chaque projet possède un dossier `documentation/projets/<numero-projet>` créé automatiquement ;
 - historique des créations et modifications avec date, utilisateur et champs modifiés (`/api/projects/{id}/activity`) ;
+- page complète de projet avec aperçu de la documentation, devis liés et génération C++ rapide ;
 - devis de tests avec étapes, conditions, pin, seuils, relais, voltage, type de mesure et unité (`/api/test-quotes`) ;
 - chaque devis est lié à un projet et à un template C++ choisi ;
 - création, modification et suppression des templates C++ personnalisés (`/api/test-templates`) ;
