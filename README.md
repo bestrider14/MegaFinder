@@ -9,6 +9,7 @@ Les images publiques sont publiées sur GitHub Container Registry. Il suffit de 
 ```powershell
 New-Item -ItemType Directory -Force documentation
 Invoke-WebRequest https://raw.githubusercontent.com/bestrider14/MegaFinder/main/compose.yaml -OutFile compose.yaml
+$env:DOCUMENTATION_HOST_PATH = (Resolve-Path .\documentation).Path
 docker compose pull
 docker compose up -d
 ```
@@ -57,7 +58,7 @@ La maquette est disponible sur `http://localhost:5173`.
 - utilisateurs, rôles et permissions additionnelles (`/api/users`) ;
 - données de dashboard (`/api/dashboard/summary`).
 
-L'API de fichiers renvoie uniquement les métadonnées et une URI `file://` pour ouvrir le fichier avec l'application du poste. Le contenu des documents n'est pas servi par Spring Boot.
+L'API de fichiers renvoie uniquement les métadonnées et une URI `file://` pour ouvrir le fichier avec l'application du poste. Le contenu des documents n'est pas servi par Spring Boot. `DOCUMENTATION_HOST_PATH` doit être un chemin absolu du poste hôte pour que les liens fonctionnent depuis Docker.
 
 Le port PostgreSQL local utilisé par défaut est `55432` afin d'éviter les conflits avec une installation PostgreSQL existante :
 

@@ -16,4 +16,5 @@ server:
   port: 8082
 app:
   documentation-root: ${MEGAFINDER_DOCUMENTATION_ROOT:./documentation}
+  documentation-host-root: ${MEGAFINDER_DOCUMENTATION_HOST_ROOT:}
   cors-origins: ${MEGAFINDER_CORS_ORIGINS:http://localhost:5173}

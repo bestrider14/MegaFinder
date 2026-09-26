@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
@@ -17,9 +19,13 @@ import java.util.stream.Stream;
 @RequestMapping("/api/files")
 public class FileController {
     private final Path documentationRoot;
+    private final String hostDocumentationRoot;
 
-    public FileController(@Value("${app.documentation-root:./documentation}") String root) {
+    public FileController(
+            @Value("${app.documentation-root:./documentation}") String root,
+            @Value("${app.documentation-host-root:}") String hostDocumentationRoot) {
         this.documentationRoot = Path.of(root).toAbsolutePath().normalize();
+        this.hostDocumentationRoot = hostDocumentationRoot == null ? "" : hostDocumentationRoot.trim();
     }
 
     @GetMapping
@@ -35,7 +41,7 @@ public class FileController {
                             "type", Files.isDirectory(item) ? "directory" : "file",
                             "extension", extension(item),
                             "path", documentationRoot.relativize(item).toString().replace('\\', '/'),
-                            "openUri", item.toUri().toString()))
+                            "openUri", openUri(item)))
                     .toList();
             return Map.of("root", documentationRoot.toString(), "path", path, "items", items);
         } catch (IOException exception) {
@@ -55,5 +61,23 @@ public class FileController {
         String name = path.getFileName().toString();
         int dot = name.lastIndexOf('.');
         return dot > 0 ? name.substring(dot + 1).toLowerCase() : "";
+    }
+
+    private String openUri(Path item) {
+        if (hostDocumentationRoot.isBlank()) {
+            return item.toUri().toString();
+        }
+
+        String hostRoot = hostDocumentationRoot.replace('\\', '/').replaceAll("/+$", "");
+        if (!hostRoot.startsWith("/")) {
+            hostRoot = "/" + hostRoot;
+        }
+        String relative = documentationRoot.relativize(item).toString().replace('\\', '/');
+
+        try {
+            return new URI("file", "", hostRoot + "/" + relative, null).toString();
+        } catch (URISyntaxException exception) {
+            throw new IllegalStateException("Chemin local invalide", exception);
+        }
     }
 }
