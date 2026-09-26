@@ -1,10 +1,8 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
-import { invoke } from '@tauri-apps/api/core'
 import { api, demoProjects, demoQuotes, demoUsers } from './services/api'
 
-const isTauri = Boolean(window.__TAURI_INTERNALS__)
-const API_URL = import.meta.env.VITE_API_URL || (isTauri ? 'http://localhost:18082/api' : '/api')
+const API_URL = import.meta.env.VITE_API_URL || '/api'
 
 const page = ref('dashboard')
 const projects = ref([])
@@ -62,15 +60,6 @@ function demoFiles(folder) {
 async function openFile(file) {
   if (file.type === 'directory') loadFiles(file.path)
   else if (file.openUri) {
-    if (isTauri) {
-      try {
-        await invoke('open_file', { path: fileSystemPath(file) })
-        notify('Fichier ouvert dans l’application associée')
-      } catch (error) {
-        notify(`Impossible d’ouvrir le fichier : ${error}`)
-      }
-      return
-    }
     const opened = window.open(file.openUri, '_blank', 'noopener,noreferrer')
     if (!opened) copyFilePath(file)
   }
