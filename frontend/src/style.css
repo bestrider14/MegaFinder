@@ -33,3 +33,7 @@ nav { display:grid; gap:4px; } nav button,.team-link { width:100%; display:flex;
 .step-line { display:grid; grid-template-columns:26px 1.3fr 1fr 1fr 65px 65px; gap:6px; align-items:center; margin-top:7px; }
 .step-line input,.step-line select { margin:0; padding:8px; min-width:0; font-size:10px; }
 .step-number { width:24px; height:24px; border-radius:6px; background:var(--purple-soft); color:var(--purple); display:grid; place-items:center; font-size:10px; font-weight:700; }
+:root { --file-actions-gap: 14px; }
+.file-actions { margin-left:auto; display:flex; gap:var(--file-actions-gap); }
+.file-actions button { margin-left:0; }
+.file-actions button:last-child { color:var(--muted); }

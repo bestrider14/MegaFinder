@@ -59,7 +59,27 @@ function demoFiles(folder) {
 
 function openFile(file) {
   if (file.type === 'directory') loadFiles(file.path)
-  else if (file.openUri) window.open(file.openUri, '_blank')
+  else if (file.openUri) {
+    const opened = window.open(file.openUri, '_blank', 'noopener,noreferrer')
+    if (!opened) copyFilePath(file)
+  }
+}
+
+function fileSystemPath(file) {
+  const uri = file.openUri || ''
+  const rawPath = uri.startsWith('file:///') ? uri.slice('file:///'.length) : uri
+  const path = decodeURIComponent(rawPath)
+  return /^[A-Za-z]:\//.test(path) ? path.replaceAll('/', '\\') : path
+}
+
+async function copyFilePath(file) {
+  const path = fileSystemPath(file)
+  try {
+    await navigator.clipboard.writeText(path)
+    notify('Chemin local copié')
+  } catch {
+    notify(`Chemin local : ${path}`)
+  }
 }
 
 function openProjectModal(project = null) {
@@ -143,7 +163,7 @@ onMounted(loadData)
 
       <section v-else-if="page === 'quotes'" class="page"><div class="page-heading"><div><p class="eyebrow">AUTOMATISATION</p><h1>Devis de tests</h1><p class="subtitle">Structurez vos scénarios et générez vos fichiers C++.</p></div><button class="primary-button" @click="openQuoteModal">＋ Nouveau devis</button></div><div class="quote-intro"><div class="quote-intro-icon">✓</div><div><strong>Un format commun pour chaque validation</strong><p>Chaque ligne décrit la condition, la mesure attendue et l’action matérielle à exécuter.</p></div><span class="quote-steps">Étape 1 / 3</span></div><div class="quote-grid"><div v-for="quote in quotes" :key="quote.id" class="quote-card"><div class="quote-card-top"><span class="badge" :class="quote.status.toLowerCase()">{{ statusLabel(quote.status) }}</span><button>•••</button></div><h3>{{ quote.name }}</h3><p>{{ quote.projectNumber }} · {{ quote.projectName }}</p><div class="quote-progress"><span><b>{{ quote.stepCount }}</b> étapes définies</span><span>{{ quote.status === 'IN_PROGRESS' ? '68' : '0' }}%</span></div><div class="progress-bar"><i :style="{ width: quote.status === 'IN_PROGRESS' ? '68%' : '8%' }"></i></div><button class="outline-button" @click="generateCpp(quote)">⌘ Générer le fichier C++</button></div><div class="quote-card new-card" @click="openQuoteModal"><div class="new-plus">＋</div><strong>Créer un nouveau devis</strong><p>Commencez avec un scénario de test vide.</p></div></div></section>
 
-      <section v-else-if="page === 'documents'" class="page"><div class="page-heading"><div><p class="eyebrow">ESPACE LOCAL</p><h1>Documentation</h1><p class="subtitle">Retrouvez vos fichiers directement depuis leur dossier de travail.</p></div><button class="primary-button" @click="loadFiles()">↻ Actualiser</button></div><div class="path-bar"><span>⌂</span><b>/ documentation</b><span v-if="currentFolder">/ {{ currentFolder }}</span><button v-if="currentFolder" @click="loadFiles('')">Revenir au dossier racine</button></div><div class="panel files-panel"><div class="files-heading"><div><h2>Fichiers disponibles</h2><p>Le contenu reste sur votre disque local.</p></div><span>{{ files.length }} éléments</span></div><div v-for="file in files" :key="file.path" class="file-row" @dblclick="openFile(file)"><div class="file-icon" :class="file.type">{{ file.type === 'directory' ? '▰' : '▤' }}</div><div><strong>{{ file.name }}</strong><small>{{ file.type === 'directory' ? 'Dossier' : file.extension.toUpperCase() + ' · fichier local' }}</small></div><button v-if="file.type === 'directory'" @click="loadFiles(file.path)">Ouvrir →</button><a v-else :href="file.openUri" target="_blank" rel="noreferrer">Ouvrir le fichier ↗</a></div><div v-if="!files.length" class="empty-state">Aucun fichier dans ce dossier.</div></div></section>
+      <section v-else-if="page === 'documents'" class="page"><div class="page-heading"><div><p class="eyebrow">ESPACE LOCAL</p><h1>Documentation</h1><p class="subtitle">Retrouvez vos fichiers directement depuis leur dossier de travail.</p></div><button class="primary-button" @click="loadFiles()">↻ Actualiser</button></div><div class="path-bar"><span>⌂</span><b>/ documentation</b><span v-if="currentFolder">/ {{ currentFolder }}</span><button v-if="currentFolder" @click="loadFiles('')">Revenir au dossier racine</button></div><div class="panel files-panel"><div class="files-heading"><div><h2>Fichiers disponibles</h2><p>Le contenu reste sur votre disque local.</p></div><span>{{ files.length }} éléments</span></div><div v-for="file in files" :key="file.path" class="file-row" @dblclick="openFile(file)"><div class="file-icon" :class="file.type">{{ file.type === 'directory' ? '▰' : '▤' }}</div><div><strong>{{ file.name }}</strong><small>{{ file.type === 'directory' ? 'Dossier' : file.extension.toUpperCase() + ' · fichier local' }}</small></div><button v-if="file.type === 'directory'" @click="loadFiles(file.path)">Ouvrir →</button><div v-else class="file-actions"><button @click.stop="openFile(file)">Ouvrir le fichier ↗</button><button @click.stop="copyFilePath(file)">Copier le chemin</button></div></div><div v-if="!files.length" class="empty-state">Aucun fichier dans ce dossier.</div></div></section>
 
       <section v-else class="page"><div class="page-heading"><div><p class="eyebrow">ADMINISTRATION</p><h1>Équipe & accès</h1><p class="subtitle">Gérez les rôles et les droits complémentaires de votre équipe.</p></div><button class="primary-button">＋ Inviter un membre</button></div><div class="role-cards"><div><span class="role-icon purple">♟</span><strong>Administrateur</strong><small>Accès complet à l’espace</small><b>1 membre</b></div><div><span class="role-icon blue">⚙</span><strong>Ingénieur</strong><small>Projets, tests et documentation</small><b>1 membre</b></div><div><span class="role-icon gray">◉</span><strong>Lecteur</strong><small>Consultation uniquement</small><b>0 membre</b></div></div><div class="panel table-panel"><div class="panel-heading"><div><h2>Membres de l’équipe</h2><p>Les permissions supplémentaires apparaissent sous chaque rôle.</p></div></div><table><thead><tr><th>MEMBRE</th><th>RÔLE</th><th>PERMISSIONS EN PLUS</th><th>STATUT</th></tr></thead><tbody><tr v-for="user in users" :key="user.id"><td><div class="project-cell"><span class="project-avatar user-avatar">{{ user.displayName.split(' ').map(x => x[0]).join('') }}</span><div><strong>{{ user.displayName }}</strong><small>{{ user.email }}</small></div></div></td><td><span class="role-pill">{{ user.role }}</span></td><td><span v-for="permission in user.extraPermissions" :key="permission" class="permission">{{ permission }}</span></td><td><span class="active-dot"></span> Actif</td></tr></tbody></table></div></section>
     </main>
