@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 public record TestQuoteRequest(
-        @NotNull Long productId,
+        @NotNull Long projectId,
         Long benchId,
         Long templateId,
         @NotBlank String name,

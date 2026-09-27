@@ -38,15 +38,14 @@ public class TestQuoteController {
     @GetMapping
     public List<Map<String, Object>> all() {
         return jdbc.queryForList("""
-                SELECT tq.id, tq.name, tq.description, tq.status, tq.product_id AS "productId",
+                SELECT tq.id, tq.name, tq.description, tq.status,
                        tq.project_id AS "projectId", tq.bench_id AS "benchId", tq.template_id AS "templateId",
-                       pr.product_number AS "productNumber", pr.name AS "productName",
-                       p.project_number AS "projectNumber", p.name AS "projectName", b.name AS "benchName",
+                       p.project_number AS "projectNumber", p.name AS "projectName",
+                       p.project_number AS "productNumber", p.name AS "productName", b.name AS "benchName",
                        tt.name AS "templateName",
                        (SELECT COUNT(*) FROM test_steps ts WHERE ts.quote_id = tq.id) AS "stepCount",
                        tq.updated_at AS "updatedAt"
-                FROM test_quotes tq JOIN products pr ON pr.id = tq.product_id
-                JOIN projects p ON p.id = tq.project_id
+                FROM test_quotes tq JOIN projects p ON p.id = tq.project_id
                 LEFT JOIN test_benches b ON b.id = tq.bench_id
                 LEFT JOIN test_templates tt ON tt.id = tq.template_id
                 ORDER BY tq.updated_at DESC
@@ -56,13 +55,12 @@ public class TestQuoteController {
     @GetMapping("/{id}")
     public Map<String, Object> one(@PathVariable long id) {
         Map<String, Object> quote = jdbc.queryForMap("""
-                SELECT tq.id, tq.name, tq.description, tq.status, tq.product_id AS "productId",
+                SELECT tq.id, tq.name, tq.description, tq.status,
                        tq.project_id AS "projectId", tq.bench_id AS "benchId", tq.template_id AS "templateId",
-                       pr.product_number AS "productNumber", pr.name AS "productName",
-                       p.project_number AS "projectNumber", p.name AS "projectName", b.name AS "benchName",
+                       p.project_number AS "projectNumber", p.name AS "projectName",
+                       p.project_number AS "productNumber", p.name AS "productName", b.name AS "benchName",
                        tt.name AS "templateName", tt.content AS "templateContent"
-                FROM test_quotes tq JOIN products pr ON pr.id = tq.product_id
-                JOIN projects p ON p.id = tq.project_id
+                FROM test_quotes tq JOIN projects p ON p.id = tq.project_id
                 LEFT JOIN test_benches b ON b.id = tq.bench_id
                 LEFT JOIN test_templates tt ON tt.id = tq.template_id
                 WHERE tq.id = ?
@@ -170,11 +168,11 @@ public class TestQuoteController {
     @Transactional
     public Map<String, Object> create(@Valid @RequestBody TestQuoteRequest request) {
         long id = jdbc.queryForObject("""
-                INSERT INTO test_quotes (project_id, product_id, bench_id, template_id, name, description, status)
-                VALUES ((SELECT project_id FROM products WHERE id = ?), ?, ?,
+                INSERT INTO test_quotes (project_id, bench_id, template_id, name, description, status)
+                VALUES (?, ?,
                         COALESCE(?, (SELECT id FROM test_templates WHERE template_key = 'DEFAULT')),
                         ?, ?, COALESCE(?, 'DRAFT')) RETURNING id
-                """, Long.class, request.productId(), request.productId(), request.benchId(), request.templateId(),
+                """, Long.class, request.projectId(), request.benchId(), request.templateId(),
                 request.name(), request.description(), request.status());
         replaceReferences(id, request.references());
         replaceSteps(id, request.steps());
@@ -185,10 +183,10 @@ public class TestQuoteController {
     @Transactional
     public Map<String, Object> update(@PathVariable long id, @Valid @RequestBody TestQuoteRequest request) {
         jdbc.update("""
-                UPDATE test_quotes SET project_id = (SELECT project_id FROM products WHERE id = ?), product_id = ?,
-                bench_id = ?, template_id = COALESCE(?, template_id), name = ?, description = ?,
+                UPDATE test_quotes SET project_id = ?, bench_id = ?, template_id = COALESCE(?, template_id),
+                name = ?, description = ?,
                 status = COALESCE(?, status), updated_at = CURRENT_TIMESTAMP WHERE id = ?
-                """, request.productId(), request.productId(), request.benchId(), request.templateId(), request.name(),
+                """, request.projectId(), request.benchId(), request.templateId(), request.name(),
                 request.description(), request.status(), id);
         replaceReferences(id, request.references());
         replaceSteps(id, request.steps());
