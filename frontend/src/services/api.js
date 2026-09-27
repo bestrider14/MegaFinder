@@ -28,6 +28,24 @@ export const demoProjects = [
   { id: 3, projectNumber: 'MF-2387', name: 'Interface capteurs', contactPerson: 'Nadia Roy', description: 'Suite de tests pour les entrées analogiques.', status: 'ARCHIVED' },
 ]
 
+export const demoProducts = [
+  {
+    id: 1, projectId: 1, projectNumber: 'MF-2401', projectName: 'Banc de test ECU', productNumber: 'ECU-2401-P1',
+    name: 'Contrôleur ECU principal', description: 'Produit de démonstration pour la validation des entrées et de l’alimentation.',
+    presentation: 'Module électronique automobile avec alimentation 14 V et acquisition de courant.',
+    presentationImages: ['images/produit-vue-avant.png', 'images/produit-vue-arriere.png'],
+    enclosureImages: ['images/boitier-face-avant.png', 'images/boitier-face-arriere.png'],
+    enclosurePinout: 'TP5 = alimentation / mesure\nTP9 = GND\nTP12 = signal de réveil',
+    pcbImages: ['images/pcb-top.png', 'images/pcb-bottom.png'], pcbSpecifications: '4 couches · FR-4 · 12 V nominal · connecteur X1',
+    contacts: [{ id: 1, name: 'Sophie Tremblay', role: 'Responsable produit', email: 'sophie@example.local', phone: '' }], quoteCount: 1, contactCount: 1,
+  },
+  {
+    id: 2, projectId: 2, projectNumber: 'MF-2398', projectName: 'Module de puissance', productNumber: 'PWR-2398-P1',
+    name: 'Module de puissance', description: 'Produit de démonstration de puissance.', presentation: 'Module à caractériser.', presentationImages: [], enclosureImages: [], enclosurePinout: '', pcbImages: [], pcbSpecifications: '',
+    contacts: [{ id: 2, name: 'Marc Gagnon', role: 'Ingénieur projet', email: '', phone: '' }], quoteCount: 0, contactCount: 1,
+  },
+]
+
 export const demoQuotes = [
   { id: 1, name: 'Validation des entrées analogiques', projectNumber: 'MF-2401', projectName: 'Banc de test ECU', status: 'IN_PROGRESS', stepCount: 8 },
   { id: 2, name: 'Démarrage et alimentation', projectNumber: 'MF-2398', projectName: 'Module de puissance', status: 'DRAFT', stepCount: 12 },

@@ -56,6 +56,10 @@ La maquette est disponible sur `http://localhost:5173`.
 - historique des créations et modifications avec date, utilisateur et champs modifiés (`/api/projects/{id}/activity`) ;
 - page complète de projet avec aperçu de la documentation, devis liés et génération C++ rapide ;
 - devis de tests avec étapes, conditions, pin, seuils, relais, voltage, type de mesure et unité (`/api/test-quotes`) ;
+- produits liés à un projet avec présentation, images du boîtier et du PCB, pinout, caractéristiques et plusieurs contacts par rôle (`/api/products`) ;
+- devis attachés à un seul produit avec références Megatech/BRP/autres, étapes B/C/D/ECT, méthodes, délais, seuils et templates de mesure ;
+- décodage des équipements requis par un devis et comparaison avec le banc sélectionné (`/api/test-quotes/{id}/equipment-summary`) ;
+- export du devis de vérification en C++ et en PDF (`/api/test-quotes/{id}/generate-cpp`, `/api/test-quotes/{id}/generate-pdf`) ;
 - bancs de test configurables avec alimentations, oscilloscope, cartes relais, bornier et liaisons pin/relais (`/api/test-benches`) ;
 - association d’un banc à un devis et configuration par étape de l’alimentation, tension, courant, canaux relais et délai d’activation ;
 - chaque devis est lié à un projet et à un template C++ choisi ;
