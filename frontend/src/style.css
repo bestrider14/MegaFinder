@@ -156,3 +156,19 @@ td,.activity-row,.quick-panel>button,.file-row { border-color:#263044; color:#ae
 .form-page input::placeholder,.form-page textarea::placeholder { color:#68758d; opacity:1; }.form-page input:focus,.form-page select:focus,.form-page textarea:focus { border-color:var(--purple); box-shadow:0 0 0 2px #9b8cff26; }.form-page select option { background:#101827; color:var(--ink); }.form-page textarea { resize:vertical; min-height:96px; }.form-page .form-row input,.form-page .form-row select { margin-top:0; }.form-page .step-line input,.form-page .step-line select { margin-top:0; }.form-page .step-card-heading select { display:inline-block; width:auto; margin-top:0; }.form-page .step-order { display:inline-block; width:68px; margin-top:0; }.form-page .detail-heading-actions { display:flex; gap:9px; align-items:center; }.form-page .detail-heading-actions button { width:auto; }.form-page .remove-button { border:0; background:transparent; box-shadow:none; color:#ff9ea8; padding:5px 8px; }.form-page .step-card-footer .remove-button { width:auto; white-space:nowrap; }
 @media (max-width:850px) { .form-page-grid { grid-template-columns:1fr; }.form-page-panel.full-width { grid-column:auto; } }
 @media (max-width:600px) { .form-grid.two-columns { grid-template-columns:1fr; }.form-page .detail-page-heading { align-items:flex-start; flex-direction:column; gap:12px; }.form-page .detail-heading-actions { width:100%; }.form-page .detail-heading-actions button { flex:1; }.step-card-footer { flex-direction:column; } }
+
+/* Form controls designed for quick scanning and keyboard friendly entry. */
+.step-group-label { margin:14px 0 6px; color:#aeb8ca; font-size:10px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; }
+.compact-field { display:flex; flex-direction:column; gap:5px; min-width:0; color:#8d98ad; font-size:9px; font-weight:700; }
+.compact-field span { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.form-page .step-card .compact-field input,.form-page .step-card .compact-field select { width:100%; margin:0; }
+.step-card .measurement-line { grid-template-columns:1.4fr .9fr .7fr .75fr .75fr; }
+.step-card .resource-line { grid-template-columns:1.4fr .75fr .75fr 1fr .9fr; }
+.step-card .step-line { align-items:start; }
+.compact-field { margin:0; }
+@media (max-width:650px) {
+  .step-card .step-line,
+  .step-card .measurement-line,
+  .step-card .resource-line { grid-template-columns:1fr 1fr; }
+  .step-card .compact-field:last-child { grid-column:1 / -1; }
+}
