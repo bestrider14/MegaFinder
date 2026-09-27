@@ -56,6 +56,8 @@ La maquette est disponible sur `http://localhost:5173`.
 - historique des créations et modifications avec date, utilisateur et champs modifiés (`/api/projects/{id}/activity`) ;
 - page complète de projet avec aperçu de la documentation, devis liés et génération C++ rapide ;
 - devis de tests avec étapes, conditions, pin, seuils, relais, voltage, type de mesure et unité (`/api/test-quotes`) ;
+- bancs de test configurables avec alimentations, oscilloscope, cartes relais, bornier et liaisons pin/relais (`/api/test-benches`) ;
+- association d’un banc à un devis et configuration par étape de l’alimentation, tension, courant, canaux relais et délai d’activation ;
 - chaque devis est lié à un projet et à un template C++ choisi ;
 - création, modification et suppression des templates C++ personnalisés (`/api/test-templates`) ;
 - génération d'un fichier C++ GoogleTest via `POST /api/test-quotes/{id}/generate-cpp` ;

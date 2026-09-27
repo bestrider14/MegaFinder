@@ -22,12 +22,13 @@ public class TestQuoteController {
     @GetMapping
     public List<Map<String, Object>> all() {
         return jdbc.queryForList("""
-                SELECT tq.id, tq.name, tq.description, tq.status, tq.project_id AS \"projectId\", tq.template_id AS \"templateId\",
-                       p.project_number AS \"projectNumber\", p.name AS \"projectName\",
+                SELECT tq.id, tq.name, tq.description, tq.status, tq.project_id AS \"projectId\", tq.bench_id AS \"benchId\", tq.template_id AS \"templateId\",
+                       p.project_number AS \"projectNumber\", p.name AS \"projectName\", b.name AS \"benchName\",
                        tt.name AS \"templateName\",
                        (SELECT COUNT(*) FROM test_steps ts WHERE ts.quote_id = tq.id) AS \"stepCount\",
                        tq.updated_at AS \"updatedAt\"
                 FROM test_quotes tq JOIN projects p ON p.id = tq.project_id
+                LEFT JOIN test_benches b ON b.id = tq.bench_id
                 LEFT JOIN test_templates tt ON tt.id = tq.template_id ORDER BY tq.updated_at DESC
                 """);
     }
@@ -35,16 +36,19 @@ public class TestQuoteController {
     @GetMapping("/{id}")
     public Map<String, Object> one(@PathVariable long id) {
         Map<String, Object> quote = jdbc.queryForMap("""
-                SELECT tq.id, tq.name, tq.description, tq.status, tq.project_id AS \"projectId\", tq.template_id AS \"templateId\",
-                       p.project_number AS \"projectNumber\", p.name AS \"projectName\", tt.name AS \"templateName\",
+                SELECT tq.id, tq.name, tq.description, tq.status, tq.project_id AS \"projectId\", tq.bench_id AS \"benchId\", tq.template_id AS \"templateId\",
+                       p.project_number AS \"projectNumber\", p.name AS \"projectName\", b.name AS \"benchName\", tt.name AS \"templateName\",
                        tt.content AS \"templateContent\"
                 FROM test_quotes tq JOIN projects p ON p.id = tq.project_id
+                LEFT JOIN test_benches b ON b.id = tq.bench_id
                 LEFT JOIN test_templates tt ON tt.id = tq.template_id WHERE tq.id = ?
                 """, id);
         quote.put("steps", jdbc.queryForList("""
                 SELECT id, step_number AS \"stepNumber\", sub_step AS \"subStep\", start_condition AS \"startCondition\",
                        pin_to_test AS \"pinToTest\", measurement_type AS \"measurementType\", unit,
-                       expected_min AS \"expectedMin\", expected_max AS \"expectedMax\", relay, voltage, notes
+                       expected_min AS \"expectedMin\", expected_max AS \"expectedMax\", relay, voltage, notes,
+                       power_supply_name AS \"powerSupplyName\", supply_voltage AS \"supplyVoltage\",
+                       supply_current AS \"supplyCurrent\", relay_channels AS \"relayChannels\", relay_delay_ms AS \"relayDelayMs\"
                 FROM test_steps WHERE quote_id = ? ORDER BY step_number, sub_step
                 """, id));
         return quote;
@@ -53,9 +57,9 @@ public class TestQuoteController {
     @PostMapping
     public Map<String, Object> create(@Valid @RequestBody TestQuoteRequest request) {
         long id = jdbc.queryForObject("""
-                INSERT INTO test_quotes (project_id, template_id, name, description, status)
-                VALUES (?, COALESCE(?, (SELECT id FROM test_templates WHERE template_key = 'DEFAULT')), ?, ?, COALESCE(?, 'DRAFT')) RETURNING id
-                """, Long.class, request.projectId(), request.templateId(), request.name(), request.description(), request.status());
+                INSERT INTO test_quotes (project_id, bench_id, template_id, name, description, status)
+                VALUES (?, ?, COALESCE(?, (SELECT id FROM test_templates WHERE template_key = 'DEFAULT')), ?, ?, COALESCE(?, 'DRAFT')) RETURNING id
+                """, Long.class, request.projectId(), request.benchId(), request.templateId(), request.name(), request.description(), request.status());
         replaceSteps(id, request.steps());
         return one(id);
     }
@@ -63,10 +67,10 @@ public class TestQuoteController {
     @PutMapping("/{id}")
     public Map<String, Object> update(@PathVariable long id, @Valid @RequestBody TestQuoteRequest request) {
         jdbc.update("""
-                UPDATE test_quotes SET project_id = ?,
+                UPDATE test_quotes SET project_id = ?, bench_id = ?,
                 template_id = COALESCE(?, template_id, (SELECT id FROM test_templates WHERE template_key = 'DEFAULT')),
                 name = ?, description = ?, status = COALESCE(?, status), updated_at = CURRENT_TIMESTAMP WHERE id = ?
-                """, request.projectId(), request.templateId(), request.name(), request.description(), request.status(), id);
+                """, request.projectId(), request.benchId(), request.templateId(), request.name(), request.description(), request.status(), id);
         replaceSteps(id, request.steps());
         return one(id);
     }
@@ -87,10 +91,12 @@ public class TestQuoteController {
         for (TestStepRequest step : steps) {
             jdbc.update("""
                     INSERT INTO test_steps (quote_id, step_number, sub_step, start_condition, pin_to_test, measurement_type, unit,
-                    expected_min, expected_max, relay, voltage, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    expected_min, expected_max, relay, voltage, notes, power_supply_name, supply_voltage, supply_current,
+                    relay_channels, relay_delay_ms) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """, quoteId, value(step.stepNumber(), 1), value(step.subStep(), 1), step.startCondition(), step.pinToTest(),
                     value(step.measurementType(), "VOLTAGE"), value(step.unit(), "V"), step.expectedMin(), step.expectedMax(),
-                    step.relay(), step.voltage(), step.notes());
+                    step.relay(), step.voltage(), step.notes(), step.powerSupplyName(), step.supplyVoltage(),
+                    step.supplyCurrent(), step.relayChannels(), step.relayDelayMs());
         }
     }
 
@@ -105,6 +111,11 @@ public class TestQuoteController {
             stepOutput.append("    // Measure ").append(step.get("measurementType")).append(" on ").append(step.get("pinToTest"))
                     .append(" [").append(step.get("expectedMin")).append(", ").append(step.get("expectedMax")).append(" ").append(step.get("unit")).append("]\n");
             stepOutput.append("    // Relay: ").append(step.get("relay")).append(" | Supply: ").append(step.get("voltage")).append(" V\n");
+            stepOutput.append("    // Bench power supply: ").append(step.get("powerSupplyName"))
+                    .append(" | Setpoint: ").append(step.get("supplyVoltage")).append(" V / ")
+                    .append(step.get("supplyCurrent")).append(" A\n");
+            stepOutput.append("    // Relay channels: ").append(step.get("relayChannels"))
+                    .append(" | Activation delay: ").append(step.get("relayDelayMs")).append(" ms\n");
             stepOutput.append("    GTEST_SUCCEED();\n}\n\n");
         }
         return source.replace("{{QUOTE_ID}}", String.valueOf(quote.get("id")))
